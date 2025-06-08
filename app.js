@@ -1,4 +1,4 @@
-const integro = require('./integro')
+import integro from './integro/index.js'
 
 process.on('uncaughtException', function (e) {
     console.error(e)

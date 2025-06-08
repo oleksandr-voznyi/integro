@@ -1,5 +1,9 @@
-const fs = require('fs')
-const path = require('path')
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath, pathToFileURL } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const events = {
     list: {}
@@ -25,7 +29,8 @@ events.load = async function () {
         try {
             const moduleDir = path.join(__dirname, '..', 'modules', dirList[i])
             if (fs.existsSync(path.join(moduleDir, 'subscriptions.js'))) {
-                const subscriptions = require(path.join(moduleDir, 'subscriptions.js'))
+                const fileUrl = pathToFileURL(path.join(moduleDir, 'subscriptions.js')).href
+                const subscriptions = (await import(fileUrl)).default
                 for (const i in subscriptions) {
                     events.list[i] = events.list[i] || []
                     events.list[i].push(subscriptions[i])
@@ -40,4 +45,4 @@ events.load = async function () {
     
 }
 
-module.exports = events
+export default events

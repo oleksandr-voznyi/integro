@@ -1,7 +1,13 @@
-require('dotenv').config()
-const server = require('./server')
-let events = require('./events')
-let calls = require('./calls')
+import 'dotenv/config'
+import server from './server.js'
+import eventsModule from './events.js'
+import callsModule from './calls.js'
+import { pathToFileURL } from 'url'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+
+let events = eventsModule
+let calls = callsModule
 
 const integro = {} 
 
@@ -21,24 +27,22 @@ integro.startServer = function () {
             const query = req.url.split('?')[1] || ''
             if (query.indexOf('reload=' + process.env.RELOAD_TOKEN) !== -1) {
                 console.log('clearRequireCache')
-                const keyList = Object.keys(require.cache)
-                for (const key of keyList) {
-                    delete require.cache[key]
-                }
-                
-                events = require('./events')
+                const cacheBuster = '?update=' + Date.now()
+                events = (await import('./events.js' + cacheBuster)).default
                 await events.load()
-                calls = require('./calls')
+                calls = (await import('./calls.js' + cacheBuster)).default
                 await calls.load()
-                require('dotenv').config({ override: true })
+                await import('dotenv/config')
             }
         }
 
         path[1] = path[1].split('?')[0]
         path[1] = path[1] || 'index'
         try {
-            const mod = require('../modules/' + path[1])
-            mod(req, res, integro.call, integro.emit)
+            const modPath = require.resolve('../modules/' + path[1])
+            const mod = await import(pathToFileURL(modPath).href)
+            const handler = mod.default || mod
+            handler(req, res, integro.call, integro.emit)
         } catch (e) {
             // console.error(e)
             res.sendStatus(404)
@@ -55,4 +59,4 @@ integro.loadEvents = async function () {
     integro.emit('startup', {})
 }
 
-module.exports = integro
+export default integro
