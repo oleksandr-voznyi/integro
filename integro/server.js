@@ -1,8 +1,8 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const multer = require('multer')
-const http = require('http')
-const path = require('path')
+import express from 'express'
+import bodyParser from 'body-parser'
+import multer from 'multer'
+import http from 'http'
+import path from 'path'
 
 const app = express()
 const forms = multer()
@@ -35,4 +35,4 @@ function server (callback) {
   console.log('server started at ', port)
 }
 
-module.exports = server
+export default server

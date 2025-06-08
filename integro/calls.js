@@ -1,5 +1,9 @@
-const fs = require('fs')
-const path = require('path')
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath, pathToFileURL } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const calls = {
     methods: {}
@@ -25,7 +29,8 @@ calls.load = async function () {
         try {
             const moduleDir = path.join(__dirname, '..', 'modules', dirList[i])
             if (fs.existsSync(path.join(moduleDir, 'methods.js'))) {
-                const methods = require(path.join(moduleDir, 'methods.js'))
+                const fileUrl = pathToFileURL(path.join(moduleDir, 'methods.js')).href
+                const methods = (await import(fileUrl)).default
                 for (const i in methods) {
                     calls.methods[i] = methods[i]
                 }
@@ -38,4 +43,4 @@ calls.load = async function () {
     return true
 }
 
-module.exports = calls
+export default calls
