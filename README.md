@@ -4,7 +4,7 @@ Integro is a simple integration bus framework built on top of Express. The appli
 
 ## Setup
 
-1. Install Node.js **20**.
+1. Install Node.js **20 or later**.
 2. Clone the repository and install dependencies:
    ```bash
    npm install
