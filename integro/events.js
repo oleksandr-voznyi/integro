@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require('path')
 
 const events = {
     list: {}
@@ -17,13 +18,14 @@ events.load = async function () {
 
     let dirList = []
     try {
-        dirList = await fs.promises.readdir(__dirname + '/../modules')
+        dirList = await fs.promises.readdir(path.join(__dirname, '..', 'modules'))
     } catch (e) {}
 
     for (const i in dirList) {
         try {
-            if (fs.existsSync(__dirname + '/../modules/' + dirList[i] + '/subscriptions.js')) {
-                const subscriptions = require('../modules/' + dirList[i] + '/subscriptions')
+            const moduleDir = path.join(__dirname, '..', 'modules', dirList[i])
+            if (fs.existsSync(path.join(moduleDir, 'subscriptions.js'))) {
+                const subscriptions = require(path.join(moduleDir, 'subscriptions.js'))
                 for (const i in subscriptions) {
                     events.list[i] = events.list[i] || []
                     events.list[i].push(subscriptions[i])
