@@ -24,7 +24,7 @@ function server (callback) {
     type: 'application/xml'
   }))
 
-  app.all('*', function (req, res) {
+  app.all('/*splat', function (req, res) {
     callback(req, res)
   })
 
